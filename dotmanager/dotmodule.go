@@ -26,7 +26,7 @@ type dotModuleData struct {
 	Target string
 }
 
-type dotModule struct {
+type DotModule struct {
 	data dotModuleData
 }
 
@@ -53,7 +53,7 @@ func (status LinkStatus) String() string {
   return "Unkown";
 }
 
-func (mod *dotModule) GetDest() string {
+func (mod *DotModule) GetDest() string {
 	dest := path.Join(os.ExpandEnv(mod.data.Dest), mod.getTarget())
 	if path.IsAbs(dest) {
 		return dest
@@ -62,7 +62,7 @@ func (mod *dotModule) GetDest() string {
 
 }
 
-func (mod *dotModule) GetSrc() string {
+func (mod *DotModule) GetSrc() string {
 	src := os.ExpandEnv(mod.data.Src)
 	if path.IsAbs(src) {
 		return path.Clean(src)
@@ -70,7 +70,7 @@ func (mod *dotModule) GetSrc() string {
 	return path.Join(*mod.data.rootSrc, src)
 }
 
-func (mod *dotModule) GetName() string {
+func (mod *DotModule) GetName() string {
 	if len(mod.data.Name) == 0 {
 		return path.Base(mod.GetSrc())
 	}
@@ -78,14 +78,14 @@ func (mod *dotModule) GetName() string {
 	return mod.data.Name
 }
 
-func (mod *dotModule) getTarget() string {
+func (mod *DotModule) getTarget() string {
 	if len(mod.data.Target) == 0 {
 		return path.Base(mod.GetSrc())
 	}
 	return mod.data.Target
 }
 
-func (mod *dotModule) GetLinkStatus() (LinkStatus, bool) {
+func (mod *DotModule) GetLinkStatus() (LinkStatus, bool) {
   destPath := mod.GetDest();
   srcPath := mod.GetSrc();
 
@@ -104,4 +104,34 @@ func (mod *dotModule) GetLinkStatus() (LinkStatus, bool) {
   }
 
   return LINK_STATUS_LINKED, true;
+}
+
+func (mod *DotModule) LinkModule(force bool) error {
+  destPath := mod.GetDest();
+  srcPath := mod.GetSrc();
+
+  if err := os.MkdirAll(path.Dir(destPath), 0700); err != nil {
+    return err;
+  }
+  
+  err := os.Symlink(srcPath, destPath);
+
+  if !force || err == nil {
+    return err;
+  }
+
+  if !os.IsExist(err) {
+    return err;
+  }
+
+  os.RemoveAll(destPath);
+  return os.Symlink(srcPath, destPath)
+
+}
+
+func (mod *DotModule) UnlinkModule() error {
+  if _, isLinked := mod.GetLinkStatus(); !isLinked {
+    return nil;
+  }
+  return os.Remove(mod.GetDest());
 }

@@ -40,7 +40,7 @@ func (k keyMap) FullHelp() [][]key.Binding {
 type app struct {
   help help.Model
   keys keyMap
-  config dotmanager.DotConfig
+  config *dotmanager.DotConfig
   links []dotmanager.SymLink
   linkSelector *multiselect.MultiSelectModel[dotmanager.SymLink]
   err error
@@ -77,14 +77,26 @@ func (m app) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
     // TODO Implement
     case key.Matches(msg, m.keys.Refresh):
       return m, getDotfilesConfig("../dotfiles.toml");
+    case key.Matches(msg, key.NewBinding(key.WithKeys("l"))):
+      if m.config != nil && len(m.config.GetModules()) > 0 {
+        return m, linkModule(&m.config.GetModules()[0]);
+      }
+    return m, nil;
+    case key.Matches(msg, key.NewBinding(key.WithKeys("u"))):
+      if m.config != nil && len(m.config.GetModules()) > 0 {
+        return m, unlinkModule(&m.config.GetModules()[0]);
+      }
+    return m, nil;
     }
   case GetDotfilesConfigMsg:
     m.config = msg.config;
   case GetActiveSymLinksMsg:
     m.linkSelector = multiselect.NewMultiSelect(msg.links);
     return m, nil;
+  case LinkDotModuleMsg:
+    return m, nil;
   case ErrMsg:
-    m.err = msg;
+    m.err = msg.err;
    // TODO: Log other errors
     if msg.IsFatal() {
       return m, tea.Quit;
@@ -107,10 +119,14 @@ func (m app) View() string {
   }
   var s string;
   s += "Dotfiles Source Directory: ";
+  if m.config == nil {
+    return s;
+  }
   s += m.config.GetRootDest();
   s += "\n";
   for _, mod := range m.config.GetModules() {
-    s += mod.GetLinkStatus().String() + " " + mod.GetName() + ": " +  mod.GetSrc() + " -> " + mod.GetDest() + "\n";
+    status, _ := mod.GetLinkStatus();
+    s += status.String() + " " + mod.GetName() + ": " +  mod.GetSrc() + " -> " + mod.GetDest() + "\n";
   }
   s += m.linkSelector.View();
   return s;

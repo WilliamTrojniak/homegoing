@@ -1,22 +1,7 @@
 dest = "$HOME/"
 
 [[modules]]
-  name = "NeoVim"
-  # target = ".nvim"
-  src = "/root/nvim"
-  dest = "relative/.config/"
-
-
-[[modules]]
-  src = "$HOME/dev/dotfiles/config/alacritty"
-  dest = "$HOME/.config/"
-  target = "spotify"
-
-[[modules]]
   src = "$HOME/dev/dotfiles/config/i3"
-  dest = "$HOME/.config"
+  dest = "$HOME/.config/"
+  target = "i3test"
 
-[[modules]]
-  src = "$HOME/dev/dotfiles/config/.rofi"
-  dest = "$HOME/.config"
-  target = "rofi"

@@ -7,7 +7,11 @@ import (
 )
 
 type GetDotfilesConfigMsg struct {
-  config dotmanager.DotConfig;
+  config *dotmanager.DotConfig;
+}
+
+type LinkDotModuleMsg struct {
+  module *dotmanager.DotModule
 }
 
 type GetActiveSymLinksMsg struct { 
@@ -23,6 +27,24 @@ func getDotfilesConfig(path string) tea.Cmd {
     }
 
     return GetDotfilesConfigMsg{config: config};
+  }
+}
+
+func linkModule(mod *dotmanager.DotModule) tea.Cmd {
+  return func() tea.Msg {
+    if err := mod.LinkModule(true); err != nil {
+      return ErrMsg{isFatal: false, err: err};
+    }
+    return LinkDotModuleMsg{module: mod};
+  }
+}
+
+func unlinkModule(mod *dotmanager.DotModule) tea.Cmd {
+  return func() tea.Msg {
+    if err := mod.UnlinkModule(); err != nil {
+      return ErrMsg{isFatal: false, err: err};
+    }
+    return LinkDotModuleMsg{module: mod};
   }
 }
 

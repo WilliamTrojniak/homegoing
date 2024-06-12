@@ -24,15 +24,15 @@ func (config *DotConfig) GetRootDest() string {
   return os.ExpandEnv(config.data.Dest);
 }
 
-func (config *DotConfig) GetModules() []dotModule {
-  data := make([]dotModule, 0, len(config.data.Modules));
+func (config *DotConfig) GetModules() []DotModule {
+  data := make([]DotModule, 0, len(config.data.Modules));
   for _, mod := range config.data.Modules {
-    data = append(data, dotModule{data: mod});
+    data = append(data, DotModule{data: mod});
   }
   return data;
 }
 
-func ReadConfig(filepath string) (DotConfig, error) {
+func ReadConfig(filepath string) (*DotConfig, error) {
 
   if !path.IsAbs(filepath) {
     wd, _ := os.Getwd();
@@ -50,5 +50,5 @@ func ReadConfig(filepath string) (DotConfig, error) {
     config.data.Modules[i] = mod;
   }
 
-  return config, err;
+  return &config, err;
 } 
