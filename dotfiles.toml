@@ -1,0 +1,6 @@
+dest = "$HOME/"
+
+[[modules]]
+  dest = "${HOME}/.config/"
+  src = "nvim"
+  name = "nvim"

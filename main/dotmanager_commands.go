@@ -6,10 +6,25 @@ import (
 	tea "github.com/charmbracelet/bubbletea"
 )
 
-type GetActiveSymLinksMsg struct { 
-  Links []dotmanager.SymLink
+type GetDotfilesConfigMsg struct {
+  config dotmanager.DotConfig;
 }
 
+type GetActiveSymLinksMsg struct { 
+  links []dotmanager.SymLink
+}
+
+func getDotfilesConfig(path string) tea.Cmd {
+  return func() tea.Msg {
+    config, err := dotmanager.ReadConfig(path);
+
+    if err != nil {
+      return ErrMsg{isFatal: false, err: err};
+    }
+
+    return GetDotfilesConfigMsg{config: config};
+  }
+}
 
 func getActiveSymLinks(absLinkDestDirPath string, absLinkSrcDirPath string) tea.Cmd {
   return func() tea.Msg {
@@ -20,7 +35,7 @@ func getActiveSymLinks(absLinkDestDirPath string, absLinkSrcDirPath string) tea.
       return ErrMsg{isFatal: false, err: err}
     }
 
-    return GetActiveSymLinksMsg{Links: symlinks};
+    return GetActiveSymLinksMsg{links: symlinks};
   }
 }
 

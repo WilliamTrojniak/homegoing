@@ -11,37 +11,36 @@ import (
 )
 
 type keyMap struct {
-  help key.Binding
-  quit key.Binding
-  refresh key.Binding
-
+  Help key.Binding
+  Quit key.Binding
+  Refresh key.Binding
 }
 
 var keys = keyMap{
-  quit: key.NewBinding(
+  Quit: key.NewBinding(
     key.WithKeys("q", "ctrl+c"),
     key.WithHelp("q", "quit")),
-  help: key.NewBinding(
+  Help: key.NewBinding(
     key.WithKeys("?"),
     key.WithHelp("?", "show help")),
-  refresh: key.NewBinding(
+  Refresh: key.NewBinding(
     key.WithKeys("r"),
     key.WithHelp("r", "refresh")),
-  
 }
 
 func (k keyMap) ShortHelp() []key.Binding {
-  return []key.Binding{k.help, k.quit}
+  return []key.Binding{k.Help, k.Quit}
 }
 
 func (k keyMap) FullHelp() [][]key.Binding {
-  return [][]key.Binding{{k.help},{k.quit}};
+  return [][]key.Binding{{k.Help},{k.Quit}};
 }
 
 
 type app struct {
   help help.Model
   keys keyMap
+  config dotmanager.DotConfig
   links []dotmanager.SymLink
   linkSelector *multiselect.MultiSelectModel[dotmanager.SymLink]
   err error
@@ -52,11 +51,16 @@ func newApp() *app {
   help := help.New();
   help.ShowAll = true;
   options := make([]dotmanager.SymLink, 0);
-  return &app{help: help, keys: keys, linkSelector: multiselect.NewMultiSelect(options)};
+
+  return &app{
+    help: help, 
+    keys: keys, 
+    linkSelector: multiselect.NewMultiSelect(options),
+  };
 }
 
 func (m app) Init() tea.Cmd {
-  return getActiveSymLinks("/Users/willtrojniak/.config", "/Users/willtrojniak/dev/dotfiles/config");
+  return nil;
 }
 
 func (m app) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
@@ -66,16 +70,18 @@ func (m app) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
     // TODO: Handle resizing
   case tea.KeyMsg:
     switch {
-    case key.Matches(msg, m.keys.quit):
+    case key.Matches(msg, m.keys.Quit):
       m.isQuitting = true;
       return m, tea.Quit
-    case key.Matches(msg, m.keys.help):
+    case key.Matches(msg, m.keys.Help):
     // TODO Implement
-    case key.Matches(msg, m.keys.refresh):
-      return m, getActiveSymLinks("/Users/willtrojniak/.config", "/Users/willtrojniak/dev/dotfiles/config");
+    case key.Matches(msg, m.keys.Refresh):
+      return m, getDotfilesConfig("../dotfiles.toml")
     }
+  case GetDotfilesConfigMsg:
+    m.config = msg.config;
   case GetActiveSymLinksMsg:
-    m.linkSelector = multiselect.NewMultiSelect(msg.Links);
+    m.linkSelector = multiselect.NewMultiSelect(msg.links);
     return m, nil;
   case ErrMsg:
     m.err = msg;
@@ -100,6 +106,12 @@ func (m app) View() string {
     return fmt.Sprintf("%v", m.err);
   }
   var s string;
+  s += "Dotfiles Source Directory: ";
+  s += m.config.GetRootDest();
+  s += "\n";
+  for _, mod := range m.config.GetModules() {
+    s += mod.GetDest() + "\n";
+  }
   s += m.linkSelector.View();
   return s;
 }
