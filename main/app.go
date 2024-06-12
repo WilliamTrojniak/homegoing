@@ -4,8 +4,6 @@ import (
 	"fmt"
 	"gohome/dotmanager"
 	"gohome/multiselect"
-	"os"
-	"path"
 
 	"github.com/charmbracelet/bubbles/help"
 	"github.com/charmbracelet/bubbles/key"
@@ -78,8 +76,7 @@ func (m app) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
     case key.Matches(msg, m.keys.Help):
     // TODO Implement
     case key.Matches(msg, m.keys.Refresh):
-      wd, _ := os.Getwd();
-      return m, getDotfilesConfig(path.Join(wd, "..", "dotfiles.toml"));
+      return m, getDotfilesConfig("../dotfiles.toml");
     }
   case GetDotfilesConfigMsg:
     m.config = msg.config;
