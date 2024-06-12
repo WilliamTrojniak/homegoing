@@ -30,6 +30,29 @@ type dotModule struct {
 	data dotModuleData
 }
 
+type LinkStatus int8
+
+const (
+  LINK_STATUS_UNLINKED LinkStatus = iota
+  LINK_STATUS_EXISTS_CONFLICT
+  LINK_STATUS_TARGET_CONFLICT
+  LINK_STATUS_LINKED
+)
+
+func (status LinkStatus) String() string {
+  switch status {
+  case LINK_STATUS_UNLINKED:
+    return "Unlinked";
+  case LINK_STATUS_EXISTS_CONFLICT:
+    return "A file or directory at the destination already exists";
+  case LINK_STATUS_TARGET_CONFLICT:
+    return "A symbolic link at the destination already exists";
+  case LINK_STATUS_LINKED:
+    return "Linked";
+  }
+  return "Unkown";
+}
+
 func (mod *dotModule) GetDest() string {
 	dest := path.Join(os.ExpandEnv(mod.data.Dest), mod.getTarget())
 	if path.IsAbs(dest) {
@@ -60,4 +83,25 @@ func (mod *dotModule) getTarget() string {
 		return path.Base(mod.GetSrc())
 	}
 	return mod.data.Target
+}
+
+func (mod *dotModule) GetLinkStatus() (LinkStatus, bool) {
+  destPath := mod.GetDest();
+  srcPath := mod.GetSrc();
+
+  destFile, destErr := os.Lstat(destPath);
+  if destErr != nil {
+    return LINK_STATUS_UNLINKED, false;
+  }
+
+  if destFile.Mode() & os.ModeSymlink != os.ModeSymlink {
+    return LINK_STATUS_EXISTS_CONFLICT, false;
+  }
+  
+  linkPath, linkErr := os.Readlink(destPath);
+  if linkErr != nil || linkPath != srcPath {
+    return LINK_STATUS_TARGET_CONFLICT, false;
+  }
+
+  return LINK_STATUS_LINKED, true;
 }

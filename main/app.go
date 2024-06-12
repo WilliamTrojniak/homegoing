@@ -110,7 +110,7 @@ func (m app) View() string {
   s += m.config.GetRootDest();
   s += "\n";
   for _, mod := range m.config.GetModules() {
-    s += mod.GetName() + ": " +  mod.GetSrc() + " -> " + mod.GetDest() + "\n";
+    s += mod.GetLinkStatus().String() + " " + mod.GetName() + ": " +  mod.GetSrc() + " -> " + mod.GetDest() + "\n";
   }
   s += m.linkSelector.View();
   return s;

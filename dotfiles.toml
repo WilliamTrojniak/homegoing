@@ -8,5 +8,15 @@ dest = "$HOME/"
 
 
 [[modules]]
-  src = "alacritty"
-  dest = "/root/.config/"
+  src = "$HOME/dev/dotfiles/config/alacritty"
+  dest = "$HOME/.config/"
+  target = "spotify"
+
+[[modules]]
+  src = "$HOME/dev/dotfiles/config/i3"
+  dest = "$HOME/.config"
+
+[[modules]]
+  src = "$HOME/dev/dotfiles/config/.rofi"
+  dest = "$HOME/.config"
+  target = "rofi"
