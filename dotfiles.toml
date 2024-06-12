@@ -1,6 +1,12 @@
 dest = "$HOME/"
 
 [[modules]]
-  dest = "${HOME}/.config/"
-  src = "nvim"
-  name = "nvim"
+  name = "NeoVim"
+  # target = ".nvim"
+  src = "/root/nvim"
+  dest = "relative/.config/"
+
+
+[[modules]]
+  src = "alacritty"
+  dest = "/root/.config/"
