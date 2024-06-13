@@ -20,7 +20,7 @@ type GetActiveSymLinksMsg struct {
 
 func getDotfilesConfig(path string) tea.Cmd {
   return func() tea.Msg {
-    config, err := dotmanager.ReadConfig(path);
+    config, err := dotmanager.LoadConfig(path);
 
     if err != nil {
       return ErrMsg{isFatal: false, err: err};

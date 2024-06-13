@@ -5,6 +5,13 @@ import (
 	"path"
 )
 
+type dotModuleData struct {
+  Dest string
+  Src string
+  Name string
+  Target string
+}
+
 type DotModule struct {
 	// The path to the directory where the config should be linked to.
 	// Can be an absolute path or relative to the dest defined by the dotmanager
@@ -12,12 +19,6 @@ type DotModule struct {
 
 	// The path to the file to be linked. Relative to the dotfiles.toml config file
 	src string
-
-	// The path to the root to link, optionally specified in the config file
-	rootDst string
-
-	// The path to the directory of where the config file was loaded from
-	rootSrc string
 
 	// The name of the module, optionally specified in the config file
 	name string

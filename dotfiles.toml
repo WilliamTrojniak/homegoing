@@ -11,19 +11,24 @@ src = "/dotfiles"
   dest = "$HOME"
   name = "neovim"
 
-[[folders]]
+[[groups]]
   src = "config"
   dest = ".config"
   
-  [[folders.modules]]
+  [[groups.modules]]
     src = "$HOME/dev/dotfiles/config/alacritty"
     name = "Alacritty"
 
-  [[folders.folders]]
+  [[groups.groups]]
     src = "nested"
     dest = "/root"
 
-    [[folders.folders.modules]]
+    [[groups.groups.modules]]
       src = "here"
       dest = "woo"
+      target = "target"
+
+    [[groups.groups.modules]]
+      src = "here"
+      dest = "/overriderootwoo"
       target = "target"
