@@ -79,12 +79,12 @@ func (m app) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
       return m, getDotfilesConfig("../dotfiles.toml");
     case key.Matches(msg, key.NewBinding(key.WithKeys("l"))):
       if m.config != nil && len(m.config.GetModules()) > 0 {
-        return m, linkModule(&m.config.GetModules()[0]);
+        return m, linkModule(m.config.GetModules()[0]);
       }
     return m, nil;
     case key.Matches(msg, key.NewBinding(key.WithKeys("u"))):
       if m.config != nil && len(m.config.GetModules()) > 0 {
-        return m, unlinkModule(&m.config.GetModules()[0]);
+        return m, unlinkModule(m.config.GetModules()[0]);
       }
     return m, nil;
     }
@@ -122,7 +122,7 @@ func (m app) View() string {
   if m.config == nil {
     return s;
   }
-  s += m.config.GetRootDest();
+  s += "Loaded";
   s += "\n";
   for _, mod := range m.config.GetModules() {
     status, _ := mod.GetLinkStatus();

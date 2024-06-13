@@ -1,7 +1,29 @@
-dest = "$HOME/"
+dest = "$HOME"
+src = "/dotfiles"
 
 [[modules]]
   src = "$HOME/dev/dotfiles/config/i3"
-  dest = "$HOME/.config/"
   target = "i3test"
+  # name = "i3testname"
 
+[[modules]]
+  src = "nvim"
+  dest = "$HOME"
+  name = "neovim"
+
+[[folders]]
+  src = "config"
+  dest = ".config"
+  
+  [[folders.modules]]
+    src = "$HOME/dev/dotfiles/config/alacritty"
+    name = "Alacritty"
+
+  [[folders.folders]]
+    src = "nested"
+    dest = "/root"
+
+    [[folders.folders.modules]]
+      src = "here"
+      dest = "woo"
+      target = "target"

@@ -5,29 +5,25 @@ import (
 	"path"
 )
 
-type dotModuleData struct {
+type DotModule struct {
 	// The path to the directory where the config should be linked to.
 	// Can be an absolute path or relative to the dest defined by the dotmanager
-	Dest string
+	dest string
 
 	// The path to the file to be linked. Relative to the dotfiles.toml config file
-	Src string
+	src string
 
 	// The path to the root to link, optionally specified in the config file
-	rootDst *string
+	rootDst string
 
 	// The path to the directory of where the config file was loaded from
-	rootSrc *string
+	rootSrc string
 
 	// The name of the module, optionally specified in the config file
-	Name string
+	name string
 
 	// The filename of the created link, optionally specified in the config file
-	Target string
-}
-
-type DotModule struct {
-	data dotModuleData
+	target string
 }
 
 type LinkStatus int8
@@ -54,35 +50,19 @@ func (status LinkStatus) String() string {
 }
 
 func (mod *DotModule) GetDest() string {
-	dest := path.Join(os.ExpandEnv(mod.data.Dest), mod.getTarget())
-	if path.IsAbs(dest) {
-		return dest
-	}
-	return path.Join(os.ExpandEnv(*mod.data.rootDst), dest)
-
+	return mod.dest;
 }
 
 func (mod *DotModule) GetSrc() string {
-	src := os.ExpandEnv(mod.data.Src)
-	if path.IsAbs(src) {
-		return path.Clean(src)
-	}
-	return path.Join(*mod.data.rootSrc, src)
+  return mod.src;
 }
 
 func (mod *DotModule) GetName() string {
-	if len(mod.data.Name) == 0 {
-		return path.Base(mod.GetSrc())
-	}
-
-	return mod.data.Name
+  return mod.name;
 }
 
-func (mod *DotModule) getTarget() string {
-	if len(mod.data.Target) == 0 {
-		return path.Base(mod.GetSrc())
-	}
-	return mod.data.Target
+func (mod *DotModule) GetTarget() string {
+  return mod.target;
 }
 
 func (mod *DotModule) GetLinkStatus() (LinkStatus, bool) {
