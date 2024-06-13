@@ -3,14 +3,21 @@ package main
 import (
 	"fmt"
 	"os"
+	"path"
 
-  tea "github.com/charmbracelet/bubbletea"
+	tea "github.com/charmbracelet/bubbletea"
 )
 
 var myApp *app;
 
 func main() {
-  myApp = newApp();
+  wd, err := os.Getwd();
+  if err != nil {
+    fmt.Printf("Error while getting current working directory: %v", err);
+    os.Exit(1);
+  }
+
+  myApp = newApp(path.Join(wd, "dotfiles.toml"));
   p := tea.NewProgram(myApp);
   if _, err := p.Run(); err != nil {
     fmt.Printf("Unexpected error occured: %v", err);

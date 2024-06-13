@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"gohome/dotmanager"
 	"gohome/multiselect"
+	"path"
 
 	"github.com/charmbracelet/bubbles/help"
 	"github.com/charmbracelet/bubbles/key"
@@ -40,14 +41,15 @@ func (k keyMap) FullHelp() [][]key.Binding {
 type app struct {
   help help.Model
   keys keyMap
+  configFilePath string
   config *dotmanager.DotConfig
-  links []dotmanager.SymLink
   linkSelector *multiselect.MultiSelectModel[dotmanager.SymLink]
-  err error
+
+  error
   isQuitting bool
 }
 
-func newApp() *app {
+func newApp(configFilePath string) *app {
   help := help.New();
   help.ShowAll = true;
   options := make([]dotmanager.SymLink, 0);
@@ -55,6 +57,7 @@ func newApp() *app {
   return &app{
     help: help, 
     keys: keys, 
+    configFilePath: path.Clean(configFilePath),
     linkSelector: multiselect.NewMultiSelect(options),
   };
 }
@@ -76,7 +79,7 @@ func (m app) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
     case key.Matches(msg, m.keys.Help):
     // TODO Implement
     case key.Matches(msg, m.keys.Refresh):
-      return m, getDotfilesConfig("../dotfiles.toml");
+      return m, getDotfilesConfig(m.configFilePath);
     case key.Matches(msg, key.NewBinding(key.WithKeys("l"))):
       if m.config != nil && len(m.config.GetModules()) > 0 {
         return m, linkModule(m.config.GetModules()[0]);
@@ -96,7 +99,7 @@ func (m app) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
   case LinkDotModuleMsg:
     return m, nil;
   case ErrMsg:
-    m.err = msg.err;
+    m.error = msg.error;
    // TODO: Log other errors
     if msg.IsFatal() {
       return m, tea.Quit;
@@ -109,13 +112,13 @@ func (m app) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 
 func (m app) View() string {
   if m.isQuitting {
-    if m.err != nil {
-      return fmt.Sprintf("A fatal error occurred: %v", m.err);
+    if m.error != nil {
+      return fmt.Sprintf("A fatal error occurred: %v", m.error);
     }
     return "";
   }
-  if m.err != nil {
-    return fmt.Sprintf("%v", m.err);
+  if m.error != nil {
+    return fmt.Sprintf("%v", m.error);
   }
   var s string;
   s += "Dotfiles Source Directory: ";
