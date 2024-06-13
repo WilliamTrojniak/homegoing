@@ -5,12 +5,6 @@ import (
 	"path"
 )
 
-type dotModuleData struct {
-  Dest string
-  Src string
-  Name string
-  Target string
-}
 
 type DotModule struct {
 	// The path to the directory where the config should be linked to.
