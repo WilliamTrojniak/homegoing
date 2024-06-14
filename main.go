@@ -5,10 +5,11 @@ import (
 	"os"
 	"path"
 
+	"github.com/WilliamTrojniak/HomeGoing/homegoing"
 	tea "github.com/charmbracelet/bubbletea"
 )
 
-var myApp *app;
+var myApp *homegoing.App;
 
 func main() {
   wd, err := os.Getwd();

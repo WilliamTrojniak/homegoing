@@ -1,10 +1,10 @@
-package main
+package homegoing
 
 import (
 	"fmt"
-	"gohome/dotmodels"
 	"strings"
 
+	"github.com/WilliamTrojniak/HomeGoing/dotmodels"
 	"github.com/charmbracelet/bubbles/help"
 	"github.com/charmbracelet/bubbles/key"
 	tea "github.com/charmbracelet/bubbletea"
@@ -24,16 +24,16 @@ var keys = keyMap{
     key.WithHelp("?", "toggle help")),
 }
 
-func (m app) ShortHelp() []key.Binding {
+func (m App) ShortHelp() []key.Binding {
   return []key.Binding{m.keys.Quit, m.config.Keys.Up, m.config.Keys.Down, m.config.Keys.Refresh, m.config.Keys.Link, m.config.Keys.Unlink}
 }
 
-func (m app) FullHelp() [][]key.Binding {
+func (m App) FullHelp() [][]key.Binding {
   return [][]key.Binding{{m.keys.Quit, m.keys.Help},{m.config.Keys.Refresh}, {m.config.Keys.Link, m.config.Keys.Unlink}};
 }
 
 
-type app struct {
+type App struct {
   help help.Model
   keys keyMap
   height int
@@ -44,22 +44,22 @@ type app struct {
   isQuitting bool
 }
 
-func newApp(configFilePath string) *app {
+func newApp(configFilePath string) *App {
   help := help.New();
   help.ShowAll = false;
 
-  return &app{
+  return &App{
     help: help, 
     keys: keys, 
     config: dotmodels.NewDotConfigModel(configFilePath),
   };
 }
 
-func (m app) Init() tea.Cmd {
+func (m App) Init() tea.Cmd {
   return m.config.Init();
 }
 
-func (m app) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
+func (m App) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 
   switch msg := msg.(type) {
   case error:
@@ -89,7 +89,7 @@ func (m app) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
   return m, cmd;
 }
 
-func (m app) View() string {
+func (m App) View() string {
   if m.isQuitting {
     if m.error != nil {
       return fmt.Sprintf("A fatal error occurred: %v", m.error);

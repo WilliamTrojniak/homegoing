@@ -1,4 +1,4 @@
-module gohome
+module github.com/WilliamTrojniak/HomeGoing
 
 go 1.21.6
 

@@ -1,9 +1,9 @@
-package dotmodels 
+package dotmodels
 
 import (
-	"gohome/dotmanager"
 	"strings"
 
+	"github.com/WilliamTrojniak/HomeGoing/dotmanager"
 	"github.com/charmbracelet/bubbles/key"
 	tea "github.com/charmbracelet/bubbletea"
 )

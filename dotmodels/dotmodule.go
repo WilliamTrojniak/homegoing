@@ -1,10 +1,10 @@
 package dotmodels
 
 import (
-	"gohome/dotmanager"
 	"strings"
 	"sync"
 
+	"github.com/WilliamTrojniak/HomeGoing/dotmanager"
 	tea "github.com/charmbracelet/bubbletea"
 )
 
