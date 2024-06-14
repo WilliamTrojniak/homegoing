@@ -2,8 +2,6 @@ package main
 
 import (
 	"fmt"
-	"gohome/dotmanager"
-	"path"
 
 	"github.com/charmbracelet/bubbles/help"
 	"github.com/charmbracelet/bubbles/key"
@@ -13,7 +11,6 @@ import (
 type keyMap struct {
   Help key.Binding
   Quit key.Binding
-  Refresh key.Binding
 }
 
 var keys = keyMap{
@@ -23,9 +20,6 @@ var keys = keyMap{
   Help: key.NewBinding(
     key.WithKeys("?"),
     key.WithHelp("?", "show help")),
-  Refresh: key.NewBinding(
-    key.WithKeys("r"),
-    key.WithHelp("r", "refresh")),
 }
 
 func (k keyMap) ShortHelp() []key.Binding {
@@ -40,9 +34,7 @@ func (k keyMap) FullHelp() [][]key.Binding {
 type app struct {
   help help.Model
   keys keyMap
-  configFilePath string
-  config *dotmanager.DotConfig
-  modules []DotModuleModel
+  config DotConfigModel
 
   error
   isQuitting bool
@@ -55,17 +47,21 @@ func newApp(configFilePath string) *app {
   return &app{
     help: help, 
     keys: keys, 
-    configFilePath: path.Clean(configFilePath),
+    config: NewDotConfigModel(configFilePath),
   };
 }
 
 func (m app) Init() tea.Cmd {
-  return nil;
+  return m.config.Init();
 }
 
 func (m app) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 
   switch msg := msg.(type) {
+  case error:
+   // TODO: Log other errors
+    m.error = msg;
+    return m, nil;
   case tea.WindowSizeMsg:
     // TODO: Handle resizing
   case tea.KeyMsg:
@@ -75,38 +71,12 @@ func (m app) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
       return m, tea.Quit
     case key.Matches(msg, m.keys.Help):
     // TODO Implement
-    case key.Matches(msg, m.keys.Refresh):
-      return m, getDotfilesConfig(m.configFilePath);
-    case key.Matches(msg, key.NewBinding(key.WithKeys("l"))):
-      return m, nil;
-    case key.Matches(msg, key.NewBinding(key.WithKeys("u"))):
-      return m, nil;
     }
-  case GetDotfilesConfigMsg:
-    // TODO Move to DotModuleConfigModel
-    m.config = msg.config;
-    m.modules = make([]DotModuleModel, m.config.GetNumModules());
-    cmds := make([]tea.Cmd, 0);
-    for i, mod := range m.config.GetModules() {
-      m.modules[i] = New(mod);
-      cmds = append(cmds, m.modules[i].Init());
-    }
-    return m, tea.Batch(cmds...);
-  case error:
-    m.error = msg;
-   // TODO: Log other errors
-  default:
-    cmds := make([]tea.Cmd, 0);
-    for i, mod := range m.modules {
-      model, cmd := mod.Update(msg);
-      m.modules[i] = model;
-      cmds = append(cmds, cmd);
-    }
-    return m, tea.Batch(cmds...);
   }
-  
+  var cmd tea.Cmd;
+  m.config, cmd = m.config.Update(msg);
 
-  return m, nil;
+  return m, cmd;
 }
 
 func (m app) View() string {
@@ -120,14 +90,6 @@ func (m app) View() string {
     return fmt.Sprintf("%v", m.error);
   }
   var s string;
-  s += "Dotfiles Source Directory: ";
-  if m.config == nil {
-    return s;
-  }
-  s += "Loaded";
-  s += "\n";
-  for _, module := range m.modules {
-    s += module.View();
-  }
+  s = m.config.View();
   return s;
 }

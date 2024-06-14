@@ -32,7 +32,7 @@ type linkModuleMsg struct {
   id int
 }
 
-func New(mod *dotmanager.DotModule) DotModuleModel { 
+func NewDotModule(mod *dotmanager.DotModule) DotModuleModel { 
   return DotModuleModel{
     id: nextId(),
     DotModule: mod,
