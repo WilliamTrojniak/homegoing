@@ -1,4 +1,4 @@
-package main
+package dotmodels
 
 import (
 	"gohome/dotmanager"
@@ -18,7 +18,7 @@ func nextId() int {
   return lastId;
 }
 
-type DotModuleModel struct {
+type dotModuleModel struct {
   id int;
   *dotmanager.DotModule
   dotmanager.LinkStatus
@@ -33,22 +33,22 @@ type linkModuleMsg struct {
   id int
 }
 
-func NewDotModule(mod *dotmanager.DotModule) DotModuleModel { 
-  return DotModuleModel{
+func NewDotModule(mod *dotmanager.DotModule) dotModuleModel { 
+  return dotModuleModel{
     id: nextId(),
     DotModule: mod,
     LinkStatus: dotmanager.LINK_STATUS_UNKNOWN,
   }
 }
 
-func (m *DotModuleModel) GetStatus() tea.Cmd {
+func (m *dotModuleModel) GetStatus() tea.Cmd {
   return func() tea.Msg {
     status, _ := m.DotModule.GetLinkStatus();
     return getStatusMsg{id: m.id, LinkStatus: status};
   }
 }
 
-func (m *DotModuleModel) LinkModule(force bool) tea.Cmd {
+func (m *dotModuleModel) LinkModule(force bool) tea.Cmd {
   return func() tea.Msg {
     err := m.DotModule.LinkModule(force);
     if err != nil {
@@ -58,7 +58,7 @@ func (m *DotModuleModel) LinkModule(force bool) tea.Cmd {
   }
 }
 
-func (m *DotModuleModel) UnlinkModule() tea.Cmd {
+func (m *dotModuleModel) UnlinkModule() tea.Cmd {
   return func() tea.Msg {
     err := m.DotModule.UnlinkModule();
     if err != nil {
@@ -68,11 +68,11 @@ func (m *DotModuleModel) UnlinkModule() tea.Cmd {
   }
 }
 
-func (m DotModuleModel) Init() tea.Cmd {
+func (m dotModuleModel) Init() tea.Cmd {
   return m.GetStatus();
 }
 
-func (m DotModuleModel) Update(msg tea.Msg) (DotModuleModel, tea.Cmd) {
+func (m dotModuleModel) Update(msg tea.Msg) (dotModuleModel, tea.Cmd) {
   switch msg := msg.(type) {
   case getStatusMsg:
     if msg.id != m.id {
@@ -86,7 +86,7 @@ func (m DotModuleModel) Update(msg tea.Msg) (DotModuleModel, tea.Cmd) {
   return m, nil;
 }
 
-func (m DotModuleModel) View() string {
+func (m dotModuleModel) View() string {
   var s strings.Builder;
   switch m.LinkStatus {
   case dotmanager.LINK_STATUS_UNLINKED:

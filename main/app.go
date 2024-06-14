@@ -2,6 +2,7 @@ package main
 
 import (
 	"fmt"
+	"gohome/dotmodels"
 
 	"github.com/charmbracelet/bubbles/help"
 	"github.com/charmbracelet/bubbles/key"
@@ -34,7 +35,7 @@ func (k keyMap) FullHelp() [][]key.Binding {
 type app struct {
   help help.Model
   keys keyMap
-  config DotConfigModel
+  config dotmodels.DotConfigModel
 
   error
   isQuitting bool
@@ -47,7 +48,7 @@ func newApp(configFilePath string) *app {
   return &app{
     help: help, 
     keys: keys, 
-    config: NewDotConfigModel(configFilePath),
+    config: dotmodels.NewDotConfigModel(configFilePath),
   };
 }
 

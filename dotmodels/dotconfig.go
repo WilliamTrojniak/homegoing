@@ -1,4 +1,4 @@
-package main
+package dotmodels 
 
 import (
 	"gohome/dotmanager"
@@ -9,14 +9,14 @@ import (
 )
 
 type DotConfigModel struct {
-  Keys keyMapDotConfig
+  Keys keymap 
   filepath string
-  *dotmanager.DotConfig
-  modules []DotModuleModel
+  config *dotmanager.DotConfig
+  modules []dotModuleModel
   index int
 }
 
-type keyMapDotConfig struct {
+type keymap struct {
   Refresh key.Binding
   Link key.Binding
   Unlink key.Binding
@@ -24,7 +24,7 @@ type keyMapDotConfig struct {
   Down key.Binding
 }
 
-var keysDotConfig = keyMapDotConfig{
+var keysDotConfig = keymap{
   Refresh: key.NewBinding(
     key.WithKeys("r"),
     key.WithHelp("r", "refresh")),
@@ -42,7 +42,7 @@ var keysDotConfig = keyMapDotConfig{
     key.WithHelp("j", "down")),
 }
 
-type GetDotfilesConfigMsg struct {
+type getDotfilesConfigMsg struct {
   config *dotmanager.DotConfig;
 }
 
@@ -56,7 +56,7 @@ func (m *DotConfigModel) Load() tea.Cmd {
     if err != nil {
       return err;
     }
-    return GetDotfilesConfigMsg{config: config};
+    return getDotfilesConfigMsg{config: config};
   }
 }
 
@@ -83,18 +83,18 @@ func (m DotConfigModel) Update(msg tea.Msg) (DotConfigModel, tea.Cmd) {
     case key.Matches(msg, m.Keys.Unlink) && len(m.modules) > 0:
       return m, m.modules[m.index].UnlinkModule();
     }
-  case GetDotfilesConfigMsg:
+  case getDotfilesConfigMsg:
     m, cmd := m.initConfig(msg);
     return m, cmd;
   }
   return m.updateModuleModels(msg);
 }
 
-func (m DotConfigModel) initConfig(msg GetDotfilesConfigMsg) (DotConfigModel, tea.Cmd) {
-  m.DotConfig = msg.config;
-  m.modules = make([]DotModuleModel, m.DotConfig.GetNumModules());
-  cmds := make([]tea.Cmd, m.DotConfig.GetNumModules());
-  for i, module := range m.DotConfig.GetModules() {
+func (m DotConfigModel) initConfig(msg getDotfilesConfigMsg) (DotConfigModel, tea.Cmd) {
+  m.config = msg.config;
+  m.modules = make([]dotModuleModel, m.config.GetNumModules());
+  cmds := make([]tea.Cmd, m.config.GetNumModules());
+  for i, module := range m.config.GetModules() {
     m.modules[i] = NewDotModule(module);
     cmds[i] = m.modules[i].Init();
   }
