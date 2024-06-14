@@ -73,12 +73,12 @@ dest = "$HOME"
         name = "NeoVim"
 
     [[groups.groups]]
-        ...
+        # ...
 
 [[groups]]
     # Aboslute paths override parent paths
     dest = "/opt"
-    ...
+    # ...
 
 ```
 
