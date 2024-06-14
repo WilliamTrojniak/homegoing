@@ -16,7 +16,7 @@ func getDotfilesConfig(path string) tea.Cmd {
     config, err := dotmanager.LoadConfig(path);
 
     if err != nil {
-      return ErrMsg{isFatal: false, error: err};
+      return err
     }
 
     return GetDotfilesConfigMsg{config: config};

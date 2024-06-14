@@ -42,7 +42,7 @@ type app struct {
   keys keyMap
   configFilePath string
   config *dotmanager.DotConfig
-  // moduleSelector *multiselect.MultiSelectModel[dotmanager.SymLink]
+  modules []DotModuleModel
 
   error
   isQuitting bool
@@ -83,10 +83,26 @@ func (m app) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
       return m, nil;
     }
   case GetDotfilesConfigMsg:
+    // TODO Move to DotModuleConfigModel
     m.config = msg.config;
+    m.modules = make([]DotModuleModel, m.config.GetNumModules());
+    cmds := make([]tea.Cmd, 0);
+    for i, mod := range m.config.GetModules() {
+      m.modules[i] = New(mod);
+      cmds = append(cmds, m.modules[i].Init());
+    }
+    return m, tea.Batch(cmds...);
   case error:
     m.error = msg;
    // TODO: Log other errors
+  default:
+    cmds := make([]tea.Cmd, 0);
+    for i, mod := range m.modules {
+      model, cmd := mod.Update(msg);
+      m.modules[i] = model;
+      cmds = append(cmds, cmd);
+    }
+    return m, tea.Batch(cmds...);
   }
   
 
@@ -110,9 +126,8 @@ func (m app) View() string {
   }
   s += "Loaded";
   s += "\n";
-  for _, mod := range m.config.GetModules() {
-    status, _ := mod.GetLinkStatus();
-    s += status.String() + " " + mod.GetName() + ": " +  mod.GetSrc() + " -> " + mod.GetDest() + "\n";
+  for _, module := range m.modules {
+    s += module.View();
   }
   return s;
 }
