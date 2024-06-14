@@ -3,6 +3,7 @@ package main
 import (
 	"fmt"
 	"gohome/dotmodels"
+	"strings"
 
 	"github.com/charmbracelet/bubbles/help"
 	"github.com/charmbracelet/bubbles/key"
@@ -20,21 +21,23 @@ var keys = keyMap{
     key.WithHelp("q", "quit")),
   Help: key.NewBinding(
     key.WithKeys("?"),
-    key.WithHelp("?", "show help")),
+    key.WithHelp("?", "toggle help")),
 }
 
-func (k keyMap) ShortHelp() []key.Binding {
-  return []key.Binding{k.Help, k.Quit}
+func (m app) ShortHelp() []key.Binding {
+  return []key.Binding{m.keys.Quit, m.config.Keys.Up, m.config.Keys.Down, m.config.Keys.Refresh, m.config.Keys.Link, m.config.Keys.Unlink}
 }
 
-func (k keyMap) FullHelp() [][]key.Binding {
-  return [][]key.Binding{{k.Help},{k.Quit}};
+func (m app) FullHelp() [][]key.Binding {
+  return [][]key.Binding{{m.keys.Quit, m.keys.Help},{m.config.Keys.Refresh}, {m.config.Keys.Link, m.config.Keys.Unlink}};
 }
 
 
 type app struct {
   help help.Model
   keys keyMap
+  height int
+
   config dotmodels.DotConfigModel
 
   error
@@ -43,7 +46,7 @@ type app struct {
 
 func newApp(configFilePath string) *app {
   help := help.New();
-  help.ShowAll = true;
+  help.ShowAll = false;
 
   return &app{
     help: help, 
@@ -64,6 +67,8 @@ func (m app) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
     m.error = msg;
     return m, nil;
   case tea.WindowSizeMsg:
+    m.height = msg.Height
+    m.help.Width = msg.Width;
     // TODO: Handle resizing
   case tea.KeyMsg:
     if m.error != nil {
@@ -94,7 +99,13 @@ func (m app) View() string {
   if m.error != nil {
     return fmt.Sprintf("%v", m.error);
   }
-  var s string;
-  s = m.config.View();
-  return s;
+  var s strings.Builder;
+  configView := m.config.View();
+  helpView := m.help.View(m);
+  configHeight := strings.Count(configView, "\n");
+  helpHeight := strings.Count(helpView, "\n");
+  s.WriteString(configView);
+  s.WriteString(strings.Repeat("\n", max(m.height - configHeight - helpHeight - 1, 0)));
+  s.WriteString(helpView);
+  return s.String();
 }
