@@ -32,6 +32,10 @@ func (config *DotConfig) GetModules() []*DotModule {
   return out;
 }
 
+func (config *DotConfig) GetNumModules() int {
+  return len(config.modules);
+}
+
 func loadModulesFromConfigData(data *dotConfigGroupData, parentSrc string, parentDest string) ([]*DotModule, error) {
 
   var groupSrc, groupDest string = os.ExpandEnv(data.Src), os.ExpandEnv(data.Dest);
