@@ -3,7 +3,6 @@ package main
 import (
 	"fmt"
 	"gohome/dotmanager"
-	"gohome/multiselect"
 	"path"
 
 	"github.com/charmbracelet/bubbles/help"
@@ -43,7 +42,7 @@ type app struct {
   keys keyMap
   configFilePath string
   config *dotmanager.DotConfig
-  linkSelector *multiselect.MultiSelectModel[dotmanager.SymLink]
+  // moduleSelector *multiselect.MultiSelectModel[dotmanager.SymLink]
 
   error
   isQuitting bool
@@ -52,13 +51,11 @@ type app struct {
 func newApp(configFilePath string) *app {
   help := help.New();
   help.ShowAll = true;
-  options := make([]dotmanager.SymLink, 0);
 
   return &app{
     help: help, 
     keys: keys, 
     configFilePath: path.Clean(configFilePath),
-    linkSelector: multiselect.NewMultiSelect(options),
   };
 }
 
@@ -81,29 +78,15 @@ func (m app) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
     case key.Matches(msg, m.keys.Refresh):
       return m, getDotfilesConfig(m.configFilePath);
     case key.Matches(msg, key.NewBinding(key.WithKeys("l"))):
-      if m.config != nil && len(m.config.GetModules()) > 0 {
-        return m, linkModule(m.config.GetModules()[0]);
-      }
-    return m, nil;
+      return m, nil;
     case key.Matches(msg, key.NewBinding(key.WithKeys("u"))):
-      if m.config != nil && len(m.config.GetModules()) > 0 {
-        return m, unlinkModule(m.config.GetModules()[0]);
-      }
-    return m, nil;
+      return m, nil;
     }
   case GetDotfilesConfigMsg:
     m.config = msg.config;
-  case GetActiveSymLinksMsg:
-    m.linkSelector = multiselect.NewMultiSelect(msg.links);
-    return m, nil;
-  case LinkDotModuleMsg:
-    return m, nil;
-  case ErrMsg:
-    m.error = msg.error;
+  case error:
+    m.error = msg;
    // TODO: Log other errors
-    if msg.IsFatal() {
-      return m, tea.Quit;
-    }
   }
   
 
@@ -131,6 +114,5 @@ func (m app) View() string {
     status, _ := mod.GetLinkStatus();
     s += status.String() + " " + mod.GetName() + ": " +  mod.GetSrc() + " -> " + mod.GetDest() + "\n";
   }
-  s += m.linkSelector.View();
   return s;
 }

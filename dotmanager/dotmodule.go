@@ -28,6 +28,7 @@ const (
   LINK_STATUS_EXISTS_CONFLICT
   LINK_STATUS_TARGET_CONFLICT
   LINK_STATUS_LINKED
+  LINK_STATUS_UNKNOWN
 )
 
 func (status LinkStatus) String() string {
