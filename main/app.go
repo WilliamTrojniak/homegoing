@@ -1,4 +1,4 @@
-package homegoing
+package main
 
 import (
 	"fmt"
