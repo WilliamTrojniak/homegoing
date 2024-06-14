@@ -113,7 +113,12 @@ func (m DotConfigModel) updateModuleModels(msg tea.Msg) (DotConfigModel, tea.Cmd
 
 func (m DotConfigModel) View() string {
   var b strings.Builder;
-  for _, module := range m.modules {
+  for i, module := range m.modules {
+    if i == m.index {
+      b.WriteString("> ")
+    } else {
+      b.WriteString("  ")
+    }
     b.WriteString(module.View());
   }
   return b.String();

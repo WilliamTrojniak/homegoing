@@ -65,6 +65,10 @@ func (m app) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
   case tea.WindowSizeMsg:
     // TODO: Handle resizing
   case tea.KeyMsg:
+    if m.error != nil {
+      m.error = nil;
+      return m, nil;
+    }
     switch {
     case key.Matches(msg, m.keys.Quit):
       m.isQuitting = true;

@@ -18,7 +18,7 @@ func main() {
   }
 
   myApp = newApp(path.Join(wd, "dotfiles.toml"));
-  p := tea.NewProgram(myApp);
+  p := tea.NewProgram(myApp, tea.WithAltScreen());
   if _, err := p.Run(); err != nil {
     fmt.Printf("Unexpected error occured: %v", err);
     os.Exit(1);

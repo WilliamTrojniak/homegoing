@@ -1,34 +1,42 @@
 dest = "$HOME"
-src = "/dotfiles"
-
-[[modules]]
-  src = "$HOME/dev/dotfiles/config/i3"
-  target = "i3test"
-  # name = "i3testname"
-
-[[modules]]
-  src = "nvim"
-  dest = "$HOME"
-  name = "neovim"
+src = "$HOME/dev/dotfiles"
 
 [[groups]]
   src = "config"
   dest = ".config"
   
   [[groups.modules]]
-    src = "$HOME/dev/dotfiles/config/alacritty"
     name = "Alacritty"
+    src = "alacritty"
 
-  [[groups.groups]]
-    src = "nested"
-    dest = "/root"
+  [[groups.modules]]
+    src = "i3"
 
-    [[groups.groups.modules]]
-      src = "here"
-      dest = "woo"
-      target = "target"
+  [[groups.modules]]
+    src = "i3status"
 
-    [[groups.groups.modules]]
-      src = "here"
-      dest = "/overriderootwoo"
-      target = "target"
+  [[groups.modules]]
+    src = "iterm2"
+
+  [[groups.modules]]
+    src = "kitty"
+
+  [[groups.modules]]
+    src = "nvim"
+
+  [[groups.modules]]
+    src = "picom"
+
+  [[groups.modules]]
+    src = "rofi"
+
+  [[groups.modules]]
+    src = "starship"
+
+  [[groups.modules]]
+    src = "tmux"
+
+  [[groups.modules]]
+    src = "zathura"
+
+

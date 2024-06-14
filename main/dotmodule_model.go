@@ -1,7 +1,8 @@
-package main 
+package main
 
 import (
 	"gohome/dotmanager"
+	"strings"
 	"sync"
 
 	tea "github.com/charmbracelet/bubbletea"
@@ -86,7 +87,22 @@ func (m DotModuleModel) Update(msg tea.Msg) (DotModuleModel, tea.Cmd) {
 }
 
 func (m DotModuleModel) View() string {
-  return m.LinkStatus.String() + ": " + m.GetName() + "\n";
+  var s strings.Builder;
+  switch m.LinkStatus {
+  case dotmanager.LINK_STATUS_UNLINKED:
+    s.WriteString("[ ] ");
+  case dotmanager.LINK_STATUS_LINKED:
+    s.WriteString("[󰄬] ");
+  case dotmanager.LINK_STATUS_EXISTS_CONFLICT, dotmanager.LINK_STATUS_TARGET_CONFLICT:
+    s.WriteString("[!] ");
+  case dotmanager.LINK_STATUS_UNKNOWN:
+    s.WriteString("[?] ");
+  }
+
+  s.WriteString(m.GetName());
+  s.WriteString("\n");
+
+  return s.String();
 }
 
 
