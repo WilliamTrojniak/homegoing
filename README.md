@@ -1,15 +1,15 @@
-# HomeGoing
+# homegoing
 
 An interactive and simple to use CLI dotfiles manager.
 
 ## Installation
 Install the latest version from source using *Go*'s built-in installer, or download a precompiled binary.
 ```bash
-go install github.com/WilliamTrojniak/HomeGoing@latest
+go install github.com/WilliamTrojniak/homegoing@latest
 ```
 
 ## Running
-Run the HomeGoing command while in a directory containing a *dotfiles.toml* file.
+Run the homegoing command while in a directory containing a *dotfiles.toml* file.
 ```bash
 homegoing
 ```

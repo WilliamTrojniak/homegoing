@@ -1,4 +1,4 @@
-module github.com/WilliamTrojniak/HomeGoing
+module github.com/WilliamTrojniak/homegoing
 
 go 1.21.6
 
