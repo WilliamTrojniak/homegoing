@@ -20,7 +20,7 @@ func nextId() int {
 
 type dotModuleModel struct {
 	id int
-	*dotmanager.DotModule
+	dotmanager.DotModule
 	dotmanager.LinkStatus
 }
 
@@ -33,7 +33,7 @@ type linkModuleMsg struct {
 	id int
 }
 
-func NewDotModule(mod *dotmanager.DotModule) dotModuleModel {
+func NewDotModule(mod dotmanager.DotModule) dotModuleModel {
 	return dotModuleModel{
 		id:         nextId(),
 		DotModule:  mod,
