@@ -79,7 +79,7 @@ func (m App) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 			m.isQuitting = true
 			return m, tea.Quit
 		case key.Matches(msg, m.keys.Help):
-			// TODO Implement
+			// TODO: Implement
 		}
 	}
 	var cmd tea.Cmd
@@ -99,12 +99,15 @@ func (m App) View() string {
 		return fmt.Sprintf("%v", m.error)
 	}
 	var s strings.Builder
+	versionView := "  homegoing v0.0.1\n\n"
 	configView := m.config.View()
 	helpView := m.help.View(m)
+	versionHeight := strings.Count(versionView, "\n")
 	configHeight := strings.Count(configView, "\n")
 	helpHeight := strings.Count(helpView, "\n")
+	s.WriteString(versionView)
 	s.WriteString(configView)
-	s.WriteString(strings.Repeat("\n", max(m.height-configHeight-helpHeight-1, 0)))
+	s.WriteString(strings.Repeat("\n", max(m.height-configHeight-versionHeight-helpHeight-1, 0)))
 	s.WriteString(helpView)
 	return s.String()
 }

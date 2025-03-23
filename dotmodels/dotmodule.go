@@ -1,6 +1,7 @@
 package dotmodels
 
 import (
+	"fmt"
 	"strings"
 	"sync"
 
@@ -100,6 +101,7 @@ func (m dotModuleModel) View() string {
 	}
 
 	s.WriteString(m.GetName())
+	s.WriteString(fmt.Sprintf(" %s", m.GetTags()))
 	s.WriteString("\n")
 
 	return s.String()

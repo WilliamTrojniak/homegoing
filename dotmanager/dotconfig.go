@@ -24,6 +24,7 @@ type dotConfigModuleData struct {
 	Src    string
 	Name   string
 	Target string
+	Tags   []string
 }
 
 func (config *DotConfig) GetModules() []DotModule {
@@ -83,16 +84,16 @@ func loadModulesFromConfigData(data *dotConfigGroupData, parentSrc string, paren
 			dest = path.Join(groupDest, dest, target)
 		}
 
-		modules = append(modules, DotModule{src: src, dest: dest, name: name, target: target})
+		modules = append(modules, DotModule{src: src, dest: dest, name: name, target: target, tags: module.Tags})
 
 	}
 
 	for _, group := range data.Groups {
 		submodules, err := loadModulesFromConfigData(&group, groupSrc, groupDest)
-		modules = append(modules, submodules...)
 		if err != nil {
 			return modules, err
 		}
+		modules = append(modules, submodules...)
 	}
 
 	return modules, nil

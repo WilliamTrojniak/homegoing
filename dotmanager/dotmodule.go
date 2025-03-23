@@ -5,7 +5,6 @@ import (
 	"path"
 )
 
-
 type DotModule struct {
 	// The path to the directory where the config should be linked to.
 	// Can be an absolute path or relative to the dest defined by the dotmanager
@@ -19,95 +18,102 @@ type DotModule struct {
 
 	// The filename of the created link, optionally specified in the config file
 	target string
+
+	// Metadata for grouping configs together
+	tags []string
 }
 
 type LinkStatus int8
 
 const (
-  LINK_STATUS_UNLINKED LinkStatus = iota
-  LINK_STATUS_EXISTS_CONFLICT
-  LINK_STATUS_TARGET_CONFLICT
-  LINK_STATUS_LINKED
-  LINK_STATUS_UNKNOWN
+	LINK_STATUS_UNLINKED LinkStatus = iota
+	LINK_STATUS_EXISTS_CONFLICT
+	LINK_STATUS_TARGET_CONFLICT
+	LINK_STATUS_LINKED
+	LINK_STATUS_UNKNOWN
 )
 
 func (status LinkStatus) String() string {
-  switch status {
-  case LINK_STATUS_UNLINKED:
-    return "Unlinked";
-  case LINK_STATUS_EXISTS_CONFLICT:
-    return "A file or directory at the destination already exists";
-  case LINK_STATUS_TARGET_CONFLICT:
-    return "A symbolic link at the destination already exists";
-  case LINK_STATUS_LINKED:
-    return "Linked";
-  }
-  return "Unkown";
+	switch status {
+	case LINK_STATUS_UNLINKED:
+		return "Unlinked"
+	case LINK_STATUS_EXISTS_CONFLICT:
+		return "A file or directory at the destination already exists"
+	case LINK_STATUS_TARGET_CONFLICT:
+		return "A symbolic link at the destination already exists"
+	case LINK_STATUS_LINKED:
+		return "Linked"
+	}
+	return "Unkown"
 }
 
 func (mod *DotModule) GetDest() string {
-	return mod.dest;
+	return mod.dest
 }
 
 func (mod *DotModule) GetSrc() string {
-  return mod.src;
+	return mod.src
 }
 
 func (mod *DotModule) GetName() string {
-  return mod.name;
+	return mod.name
 }
 
 func (mod *DotModule) GetTarget() string {
-  return mod.target;
+	return mod.target
+}
+
+func (mod *DotModule) GetTags() []string {
+	return mod.tags
 }
 
 func (mod *DotModule) GetLinkStatus() (LinkStatus, bool) {
-  destPath := mod.GetDest();
-  srcPath := mod.GetSrc();
+	destPath := mod.GetDest()
+	srcPath := mod.GetSrc()
 
-  destFile, destErr := os.Lstat(destPath);
-  if destErr != nil {
-    return LINK_STATUS_UNLINKED, false;
-  }
+	destFile, destErr := os.Lstat(destPath)
+	if destErr != nil {
+		return LINK_STATUS_UNLINKED, false
+	}
 
-  if destFile.Mode() & os.ModeSymlink != os.ModeSymlink {
-    return LINK_STATUS_EXISTS_CONFLICT, false;
-  }
-  
-  linkPath, linkErr := os.Readlink(destPath);
-  if linkErr != nil || linkPath != srcPath {
-    return LINK_STATUS_TARGET_CONFLICT, false;
-  }
+	if destFile.Mode()&os.ModeSymlink != os.ModeSymlink {
+		return LINK_STATUS_EXISTS_CONFLICT, false
+	}
 
-  return LINK_STATUS_LINKED, true;
+	linkPath, linkErr := os.Readlink(destPath)
+	if linkErr != nil || linkPath != srcPath {
+		return LINK_STATUS_TARGET_CONFLICT, false
+	}
+
+	return LINK_STATUS_LINKED, true
 }
 
 func (mod *DotModule) LinkModule(force bool) error {
-  destPath := mod.GetDest();
-  srcPath := mod.GetSrc();
+	destPath := mod.GetDest()
+	srcPath := mod.GetSrc()
 
-  if err := os.MkdirAll(path.Dir(destPath), 0700); err != nil {
-    return err;
-  }
-  
-  err := os.Symlink(srcPath, destPath);
+	if err := os.MkdirAll(path.Dir(destPath), 0700); err != nil {
+		return err
+	}
 
-  if !force || err == nil {
-    return err;
-  }
+	err := os.Symlink(srcPath, destPath)
 
-  if !os.IsExist(err) {
-    return err;
-  }
+	if !force || err == nil {
+		return err
+	}
 
-  os.RemoveAll(destPath);
-  return os.Symlink(srcPath, destPath)
+	if !os.IsExist(err) {
+		return err
+	}
+
+	os.RemoveAll(destPath)
+	return os.Symlink(srcPath, destPath)
 
 }
 
 func (mod *DotModule) UnlinkModule() error {
-  if _, isLinked := mod.GetLinkStatus(); !isLinked {
-    return nil;
-  }
-  return os.Remove(mod.GetDest());
+	if _, isLinked := mod.GetLinkStatus(); !isLinked {
+		return nil
+	}
+	return os.Remove(mod.GetDest())
 }
