@@ -89,6 +89,8 @@ func (m App) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 }
 
 func (m App) View() string {
+	var s strings.Builder
+	versionView := "  homegoing v0.0.1\n\n"
 	if m.isQuitting {
 		if m.error != nil {
 			return fmt.Sprintf("A fatal error occurred: %v", m.error)
@@ -96,10 +98,10 @@ func (m App) View() string {
 		return ""
 	}
 	if m.error != nil {
-		return fmt.Sprintf("%v", m.error)
+		s.WriteString(fmt.Sprintf("%v", m.error))
+		s.WriteString(strings.Repeat("\n", max(0, m.height-3)))
+		return s.String()
 	}
-	var s strings.Builder
-	versionView := "  homegoing v0.0.1\n\n"
 	configView := m.config.View()
 	helpView := m.help.View(m)
 	versionHeight := strings.Count(versionView, "\n")

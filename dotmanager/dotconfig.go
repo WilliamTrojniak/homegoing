@@ -115,6 +115,16 @@ func LoadConfig(filepath string) (*DotConfig, error) {
 
 	srcDir := path.Dir(filepath)
 	modules, err := loadModulesFromConfigData(&configData, srcDir, srcDir)
+	tags := make(map[string][]DotModule)
+	for _, module := range modules {
+		for _, tag := range module.tags {
+			if modules, ok := tags[tag]; ok {
+				tags[tag] = append(modules, module)
+			} else {
+				tags[tag] = []DotModule{module}
+			}
+		}
+	}
 	config := DotConfig{modules: modules}
 
 	return &config, err

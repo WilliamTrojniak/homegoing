@@ -7,6 +7,7 @@ import (
 
 	"github.com/WilliamTrojniak/homegoing/dotmanager"
 	tea "github.com/charmbracelet/bubbletea"
+	"github.com/charmbracelet/lipgloss"
 )
 
 var lastId int
@@ -100,9 +101,11 @@ func (m dotModuleModel) View() string {
 		s.WriteString("[?] ")
 	}
 
+	tagStyle := lipgloss.NewStyle().
+		Foreground(lipgloss.Color("7")).Faint(true)
+
 	s.WriteString(m.GetName())
-	s.WriteString(fmt.Sprintf(" %s", m.GetTags()))
-	s.WriteString("\n")
+	s.WriteString(tagStyle.Render(fmt.Sprintf(" [%s]", strings.Join(m.GetTags(), ", "))))
 
 	return s.String()
 }

@@ -1,6 +1,8 @@
 package dotmodels
 
 import (
+	"fmt"
+	"slices"
 	"strings"
 
 	"github.com/WilliamTrojniak/homegoing/dotmanager"
@@ -13,7 +15,10 @@ type DotConfigModel struct {
 	filepath string
 	config   *dotmanager.DotConfig
 	modules  []dotModuleModel
+	tags     []dotModuleTagModel
+
 	index    int
+	tagIndex int
 }
 
 type keymap struct {
@@ -22,6 +27,8 @@ type keymap struct {
 	Unlink  key.Binding
 	Up      key.Binding
 	Down    key.Binding
+	Left    key.Binding
+	Right   key.Binding
 }
 
 var keysDotConfig = keymap{
@@ -40,6 +47,14 @@ var keysDotConfig = keymap{
 	Down: key.NewBinding(
 		key.WithKeys("j"),
 		key.WithHelp("j", "down")),
+	Left: key.NewBinding(
+		key.WithKeys("h"),
+		key.WithHelp("h", "left"),
+	),
+	Right: key.NewBinding(
+		key.WithKeys("l"),
+		key.WithHelp("l", "right"),
+	),
 }
 
 type getDotfilesConfigMsg struct {
@@ -72,16 +87,16 @@ func (m DotConfigModel) Update(msg tea.Msg) (DotConfigModel, tea.Cmd) {
 		switch {
 		case key.Matches(msg, m.Keys.Refresh):
 			return m, m.Load()
-		case key.Matches(msg, m.Keys.Up):
-			m.index = max(m.index-1, 0)
+		case key.Matches(msg, m.Keys.Left):
+			m.tagIndex = max(0, m.tagIndex-1)
+			return m, m.tags[m.tagIndex].Init()
+		case key.Matches(msg, m.Keys.Right):
+			m.tagIndex = min(len(m.tags)-1, m.tagIndex+1)
 			return m, nil
-		case key.Matches(msg, m.Keys.Down):
-			m.index = min(m.index+1, len(m.modules)-1)
-			return m, nil
-		case key.Matches(msg, m.Keys.Link) && len(m.modules) > 0:
-			return m, m.modules[m.index].LinkModule(false)
-		case key.Matches(msg, m.Keys.Unlink) && len(m.modules) > 0:
-			return m, m.modules[m.index].UnlinkModule()
+		default:
+			var cmd tea.Cmd
+			m.tags[m.tagIndex], cmd = m.tags[m.tagIndex].Update(msg)
+			return m, cmd
 		}
 	case getDotfilesConfigMsg:
 		m, cmd := m.initConfig(msg)
@@ -92,12 +107,41 @@ func (m DotConfigModel) Update(msg tea.Msg) (DotConfigModel, tea.Cmd) {
 
 func (m DotConfigModel) initConfig(msg getDotfilesConfigMsg) (DotConfigModel, tea.Cmd) {
 	m.config = msg.config
+	m.tags = make([]dotModuleTagModel, 0)
 	m.modules = make([]dotModuleModel, m.config.GetNumModules())
+	tags := make(map[string][]*dotModuleModel)
+	tags["All"] = []*dotModuleModel{}
+
 	cmds := make([]tea.Cmd, m.config.GetNumModules())
-	for i, module := range m.config.GetModules() {
-		m.modules[i] = NewDotModule(module)
-		cmds[i] = m.modules[i].Init()
+	for i, moduleData := range m.config.GetModules() {
+		m.modules[i] = NewDotModule(moduleData)
+		module := &m.modules[i]
+		cmds[i] = module.Init()
+		tags["All"] = append(tags["All"], module)
+
+		for _, tag := range moduleData.GetTags() {
+
+			if modules, ok := tags[tag]; ok {
+				tags[tag] = append(modules, module)
+			} else {
+				tags[tag] = []*dotModuleModel{module}
+			}
+		}
+
+		// TODO: Init tags
 	}
+
+	for tag, modules := range tags {
+		m.tags = append(m.tags, NewDotModuleTag(tag, modules, m.Keys))
+	}
+
+	slices.SortFunc(m.tags, func(t1, t2 dotModuleTagModel) int {
+		if t1.tag < t2.tag {
+			return -1
+		}
+		return 1
+	})
+
 	return m, tea.Batch(cmds...)
 
 }
@@ -113,13 +157,17 @@ func (m DotConfigModel) updateModuleModels(msg tea.Msg) (DotConfigModel, tea.Cmd
 
 func (m DotConfigModel) View() string {
 	var b strings.Builder
-	for i, module := range m.modules {
-		if i == m.index {
-			b.WriteString("> ")
-		} else {
-			b.WriteString("  ")
-		}
-		b.WriteString(module.View())
+
+	b.WriteString("  ")
+	for _, tag := range m.tags {
+		b.WriteString(fmt.Sprintf("%s (%v), ", tag.tag, len(tag.moduleModels)))
 	}
+	b.WriteString("\n\n")
+
+	if m.tagIndex < len(m.tags) {
+		b.WriteString(m.tags[m.tagIndex].View())
+	}
+
 	return b.String()
+
 }
