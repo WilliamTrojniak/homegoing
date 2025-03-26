@@ -28,7 +28,7 @@ All configuration is done inside a *dotfiles.toml* file.
 | **src**       | ```filepath?```   | Path to the directory which all child ```src``` values are relative to. Defaults to the path of the configuration file's parent directory. |
 | **dest**      | ```filepath?```   | Path to the directory which all child ```dest``` paths are relative to. Defaults to the path of the configuration file's parent directory. |
 | **groups**    | ```group[]?```    | A recursive structure allowing for grouping of modules. |
-| **modules**   | ```module[]?```   | List of modules at the root level. Each module represents a source directory/file to be symlinked.
+| **modules**   | ```module[]?```   | List of modules at the root level. Each module represents a source directory/file to be symlinked. |
 
 
 ###### type: ```group``` 
@@ -38,7 +38,7 @@ All configuration is done inside a *dotfiles.toml* file.
 | **src**       | ```filepath?```   | Path to the directory which all child ```src``` values are relative to.|
 | **dest**      | ```filepath?```   | Path to the directory which all child ```dest``` values are relative to. |
 | **groups**    | ```group[]?```    | A recursive structure which allows for grouping of dotmodules. |
-| **modules**   | ```module[]?```   | List of modules within the grouping. Each module represents a source directory/file to be symlinked.
+| **modules**   | ```module[]?```   | List of modules within the grouping. Each module represents a source directory/file to be symlinked.|
 
 
 ###### type: ```module```
