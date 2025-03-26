@@ -73,7 +73,6 @@ func (m App) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 	case tea.KeyMsg:
 		if m.error != nil {
 			m.error = nil
-			return m, nil
 		}
 		switch {
 		case key.Matches(msg, m.keys.Quit):
@@ -91,30 +90,33 @@ func (m App) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 
 func (m App) View() string {
 	var s strings.Builder
+
 	versionStyle := lipgloss.NewStyle().
 		Foreground(lipgloss.Color("0")).AlignHorizontal(lipgloss.Right).Width(m.help.Width)
+	versionView := versionStyle.Render("homegoing v0.1.1")
+	s.WriteString(versionView)
+	s.WriteString("\n")
 
-	versionView := versionStyle.Render("  homegoing v0.1.0")
 	if m.isQuitting {
 		if m.error != nil {
-			return fmt.Sprintf("A fatal error occurred: %v", m.error)
+			s.WriteString(fmt.Sprintf("A fatal error occurred: %v", m.error))
+			return s.String()
 		}
 		return ""
 	}
-	if m.error != nil {
-		s.WriteString(fmt.Sprintf("%v", m.error))
-		s.WriteString(strings.Repeat("\n", max(0, m.height-3)))
-		return s.String()
-	}
+
 	configView := m.config.View()
 	helpView := m.help.View(m)
 	versionHeight := strings.Count(versionView, "\n")
 	configHeight := strings.Count(configView, "\n")
 	helpHeight := strings.Count(helpView, "\n")
-	s.WriteString(versionView)
-	s.WriteString("\n")
+	errHeight := 0
 	s.WriteString(configView)
-	s.WriteString(strings.Repeat("\n", max(m.height-configHeight-versionHeight-helpHeight-2, 0)))
+	if m.error != nil {
+		s.WriteString(fmt.Sprintf("  An error has occurred:\n  %v", m.error))
+		errHeight = 1
+	}
+	s.WriteString(strings.Repeat("\n", max(m.height-configHeight-versionHeight-helpHeight-errHeight-2, 0)))
 	s.WriteString(helpView)
 	return s.String()
 }
