@@ -93,17 +93,18 @@ func (m DotConfigModel) Update(msg tea.Msg) (DotConfigModel, tea.Cmd) {
 			return m, m.tags[m.tagIndex].Init()
 		case key.Matches(msg, m.Keys.Right):
 			m.tagIndex = min(len(m.tags)-1, m.tagIndex+1)
-			return m, nil
-		default:
-			var cmd tea.Cmd
-			m.tags[m.tagIndex], cmd = m.tags[m.tagIndex].Update(msg)
-			return m, cmd
+			return m, m.tags[m.tagIndex].Init()
 		}
 	case getDotfilesConfigMsg:
 		m, cmd := m.initConfig(msg)
 		return m, cmd
 	}
-	return m.updateModuleModels(msg)
+	var cmd tea.Cmd
+	if len(m.tags) > 0 {
+		m.tags[m.tagIndex], cmd = m.tags[m.tagIndex].Update(msg)
+	}
+	m, modCmd := m.updateModuleModels(msg)
+	return m, tea.Batch(cmd, modCmd)
 }
 
 func (m DotConfigModel) initConfig(msg getDotfilesConfigMsg) (DotConfigModel, tea.Cmd) {
@@ -153,7 +154,6 @@ func (m DotConfigModel) updateModuleModels(msg tea.Msg) (DotConfigModel, tea.Cmd
 		m.modules[i], cmds[i] = moduleModel.Update(msg)
 	}
 	return m, tea.Batch(cmds...)
-
 }
 
 func (m DotConfigModel) View() string {
