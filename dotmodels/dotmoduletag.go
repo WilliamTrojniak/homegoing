@@ -65,6 +65,7 @@ func (m dotModuleTagModel) Update(msg tea.Msg) (dotModuleTagModel, tea.Cmd) {
 			return m, m.moduleModels[m.modelIndex].UnlinkModule()
 		}
 	}
+
 	return m, nil
 }
 

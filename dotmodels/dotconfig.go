@@ -90,10 +90,24 @@ func (m DotConfigModel) Update(msg tea.Msg) (DotConfigModel, tea.Cmd) {
 			return m, m.Load()
 		case key.Matches(msg, m.Keys.Left):
 			m.tagIndex = max(0, m.tagIndex-1)
-			return m, m.tags[m.tagIndex].Init()
+			m.index = min(m.index, len(m.tags[m.tagIndex].moduleModels)-1)
+			m.tags[m.tagIndex].modelIndex = m.index
+			return m, nil
 		case key.Matches(msg, m.Keys.Right):
 			m.tagIndex = min(len(m.tags)-1, m.tagIndex+1)
-			return m, m.tags[m.tagIndex].Init()
+			m.index = min(m.index, len(m.tags[m.tagIndex].moduleModels)-1)
+			m.tags[m.tagIndex].modelIndex = m.index
+			return m, nil
+		case key.Matches(msg, m.Keys.Up):
+			m.index = max(0, m.index-1)
+			var cmd tea.Cmd
+			m.tags[m.tagIndex], cmd = m.tags[m.tagIndex].Update(msg)
+			return m, cmd
+		case key.Matches(msg, m.Keys.Down):
+			m.index = min(len(m.tags[m.tagIndex].moduleModels)-1, m.index+1)
+			var cmd tea.Cmd
+			m.tags[m.tagIndex], cmd = m.tags[m.tagIndex].Update(msg)
+			return m, cmd
 		}
 	case getDotfilesConfigMsg:
 		m, cmd := m.initConfig(msg)
@@ -164,8 +178,7 @@ func (m DotConfigModel) View() string {
 		Background(lipgloss.Color("4"))
 
 	tagStyle := lipgloss.NewStyle().
-		Background(lipgloss.Color("8")).
-		BorderRight(true)
+		Background(lipgloss.Color("8"))
 
 	b.WriteString(" ")
 	for i, tag := range m.tags {

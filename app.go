@@ -8,6 +8,7 @@ import (
 	"github.com/charmbracelet/bubbles/help"
 	"github.com/charmbracelet/bubbles/key"
 	tea "github.com/charmbracelet/bubbletea"
+	"github.com/charmbracelet/lipgloss"
 )
 
 type keyMap struct {
@@ -90,7 +91,10 @@ func (m App) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 
 func (m App) View() string {
 	var s strings.Builder
-	versionView := "  homegoing v0.0.3\n\n"
+	versionStyle := lipgloss.NewStyle().
+		Foreground(lipgloss.Color("0")).AlignHorizontal(lipgloss.Right).Width(m.help.Width)
+
+	versionView := versionStyle.Render("  homegoing v0.1.0")
 	if m.isQuitting {
 		if m.error != nil {
 			return fmt.Sprintf("A fatal error occurred: %v", m.error)
@@ -108,8 +112,9 @@ func (m App) View() string {
 	configHeight := strings.Count(configView, "\n")
 	helpHeight := strings.Count(helpView, "\n")
 	s.WriteString(versionView)
+	s.WriteString("\n")
 	s.WriteString(configView)
-	s.WriteString(strings.Repeat("\n", max(m.height-configHeight-versionHeight-helpHeight-1, 0)))
+	s.WriteString(strings.Repeat("\n", max(m.height-configHeight-versionHeight-helpHeight-2, 0)))
 	s.WriteString(helpView)
 	return s.String()
 }
