@@ -2,6 +2,8 @@
 
 An interactive and simple to use CLI dotfiles manager.
 
+![homegoing graphical user interface](./homegoing.png) 
+
 ## Installation
 Install the latest version from source using *Go*'s built-in installer, or download a precompiled binary.
 ```bash
