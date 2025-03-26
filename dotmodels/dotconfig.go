@@ -8,6 +8,7 @@ import (
 	"github.com/WilliamTrojniak/homegoing/dotmanager"
 	"github.com/charmbracelet/bubbles/key"
 	tea "github.com/charmbracelet/bubbletea"
+	"github.com/charmbracelet/lipgloss"
 )
 
 type DotConfigModel struct {
@@ -158,9 +159,23 @@ func (m DotConfigModel) updateModuleModels(msg tea.Msg) (DotConfigModel, tea.Cmd
 func (m DotConfigModel) View() string {
 	var b strings.Builder
 
-	b.WriteString("  ")
-	for _, tag := range m.tags {
-		b.WriteString(fmt.Sprintf("%s (%v), ", tag.tag, len(tag.moduleModels)))
+	selectedTagStyle := lipgloss.NewStyle().
+		Foreground(lipgloss.Color("0")).
+		Background(lipgloss.Color("4"))
+
+	tagStyle := lipgloss.NewStyle().
+		Background(lipgloss.Color("8")).
+		BorderRight(true)
+
+	b.WriteString(" ")
+	for i, tag := range m.tags {
+		s := fmt.Sprintf(" %s (%v) ", tag.tag, len(tag.moduleModels))
+		if i == m.tagIndex {
+			b.WriteString(selectedTagStyle.Render(s))
+		} else {
+			b.WriteString(tagStyle.Render(s))
+		}
+		b.WriteString(" ")
 	}
 	b.WriteString("\n\n")
 

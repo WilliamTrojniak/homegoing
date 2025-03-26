@@ -90,7 +90,7 @@ func (m App) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 
 func (m App) View() string {
 	var s strings.Builder
-	versionView := "  homegoing v0.0.1\n\n"
+	versionView := "  homegoing v0.0.2\n\n"
 	if m.isQuitting {
 		if m.error != nil {
 			return fmt.Sprintf("A fatal error occurred: %v", m.error)
