@@ -3,10 +3,10 @@ package dotmodels
 import (
 	"strings"
 
-	"github.com/WilliamTrojniak/homegoing/dotmanager"
 	"github.com/charmbracelet/bubbles/key"
 	tea "github.com/charmbracelet/bubbletea"
 	"github.com/charmbracelet/lipgloss/list"
+	"github.com/willtrojniak/homegoing/dotmanager"
 )
 
 type dotModuleTagModel struct {

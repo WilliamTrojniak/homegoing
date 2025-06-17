@@ -4,11 +4,11 @@ import (
 	"fmt"
 	"strings"
 
-	"github.com/WilliamTrojniak/homegoing/dotmodels"
 	"github.com/charmbracelet/bubbles/help"
 	"github.com/charmbracelet/bubbles/key"
 	tea "github.com/charmbracelet/bubbletea"
 	"github.com/charmbracelet/lipgloss"
+	"github.com/willtrojniak/homegoing/dotmodels"
 )
 
 type keyMap struct {

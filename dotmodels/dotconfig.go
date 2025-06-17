@@ -5,10 +5,10 @@ import (
 	"slices"
 	"strings"
 
-	"github.com/WilliamTrojniak/homegoing/dotmanager"
 	"github.com/charmbracelet/bubbles/key"
 	tea "github.com/charmbracelet/bubbletea"
 	"github.com/charmbracelet/lipgloss"
+	"github.com/willtrojniak/homegoing/dotmanager"
 )
 
 type DotConfigModel struct {

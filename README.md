@@ -7,7 +7,7 @@ An interactive and simple to use CLI dotfiles manager.
 ## Installation
 Install the latest version from source using *Go*'s built-in installer, or download a precompiled binary.
 ```bash
-go install github.com/WilliamTrojniak/homegoing@latest
+go install github.com/willtrojniak/homegoing@latest
 ```
 
 ## Running

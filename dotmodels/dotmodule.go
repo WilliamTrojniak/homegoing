@@ -5,9 +5,9 @@ import (
 	"strings"
 	"sync"
 
-	"github.com/WilliamTrojniak/homegoing/dotmanager"
 	tea "github.com/charmbracelet/bubbletea"
 	"github.com/charmbracelet/lipgloss"
+	"github.com/willtrojniak/homegoing/dotmanager"
 )
 
 var lastId int
